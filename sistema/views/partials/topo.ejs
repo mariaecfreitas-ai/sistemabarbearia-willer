@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= titulo %> · Barbearia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+  <header class="topo">
+    <a href="/painel" class="marca">
+      <span class="marca-icone" aria-hidden="true">✂</span>
+      <span>Barbearia<small>Gestão &amp; Agenda</small></span>
+    </a>
+
+    <nav class="menu" aria-label="Menu principal">
+      <a href="/painel"       class="<%= paginaAtual === 'painel' ? 'ativo' : '' %>">Painel</a>
+      <a href="/clientes"     class="<%= paginaAtual === 'clientes' ? 'ativo' : '' %>">Clientes</a>
+      <a href="/barbeiros"    class="<%= paginaAtual === 'barbeiros' ? 'ativo' : '' %>">Barbeiros</a>
+      <a href="/servicos"     class="<%= paginaAtual === 'servicos' ? 'ativo' : '' %>">Serviços</a>
+      <a href="/agendamentos" class="<%= paginaAtual === 'agendamentos' ? 'ativo' : '' %>">Agendamentos</a>
+    </nav>
+
+    <div class="sessao">
+      <span class="usuario-logado" title="<%= usuario.email %>">👤 <%= usuario.nome %></span>
+      <form action="/logout" method="POST">
+        <button type="submit" class="botao botao-sair">Sair</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <%- include('avisos') %>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login · Barbearia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body class="pagina-login">
+  <main class="login-caixa">
+    <div class="login-marca">
+      <span class="marca-icone grande" aria-hidden="true">✂</span>
+      <h1>Barbearia</h1>
+      <p>Gestão e agendamento de atendimentos</p>
+    </div>
+
+    <%- include('partials/avisos') %>
+    <% if (locals.saiu) { %>
+      <div class="aviso aviso-sucesso" role="status">Você saiu do sistema com segurança.</div>
+    <% } %>
+
+    <form action="/login" method="POST" class="formulario" novalidate>
+      <label>E-mail
+        <input type="email" name="email" value="<%= email %>" placeholder="seu@email.com"
+               autocomplete="username" required autofocus>
+      </label>
+      <label>Senha
+        <input type="password" name="senha" placeholder="••••••" autocomplete="current-password" required>
+      </label>
+      <button type="submit" class="botao botao-primario botao-largo">Entrar</button>
+    </form>
+
+    <p class="login-dica">A sessão expira após <%= EXPIRA_MIN %> minutos sem uso.</p>
+  </main>
+</body>
+</html>

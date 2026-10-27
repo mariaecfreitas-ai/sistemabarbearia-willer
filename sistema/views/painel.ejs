@@ -1,0 +1,61 @@
+<%- include('partials/topo', { titulo: 'Painel' }) %>
+
+<section class="boas-vindas">
+  <div>
+    <p class="sobretitulo">Painel principal</p>
+    <h1>Olá, <%= usuario.nome %>!</h1>
+    <p class="suave">O que você quer fazer agora? Sua sessão expira após <%= EXPIRA_MIN %> minutos sem uso.</p>
+  </div>
+  <form action="/logout" method="POST">
+    <button type="submit" class="botao botao-contorno">Encerrar sessão</button>
+  </form>
+</section>
+
+<section class="atalhos" aria-label="Navegação">
+  <a href="/agendamentos" class="atalho destaque">
+    <span class="atalho-icone">📅</span>
+    <strong><%= totais.hoje %></strong>
+    <span>Agendamentos para hoje</span>
+    <em>Abrir agenda →</em>
+  </a>
+  <a href="/clientes" class="atalho">
+    <span class="atalho-icone">👥</span>
+    <strong><%= totais.clientes %></strong>
+    <span>Clientes</span>
+    <em>Cadastrar e buscar →</em>
+  </a>
+  <a href="/barbeiros" class="atalho">
+    <span class="atalho-icone">💈</span>
+    <strong><%= totais.barbeiros %></strong>
+    <span>Barbeiros</span>
+    <em>Gerenciar equipe →</em>
+  </a>
+  <a href="/servicos" class="atalho">
+    <span class="atalho-icone">✂</span>
+    <strong><%= totais.servicos %></strong>
+    <span>Serviços</span>
+    <em>Cortes e preços →</em>
+  </a>
+</section>
+
+<section class="cartao">
+  <div class="cartao-cabecalho">
+    <h2>Próximos atendimentos</h2>
+    <a href="/agendamentos" class="link">Ver todos</a>
+  </div>
+  <% if (proximos.length === 0) { %>
+    <p class="vazio">Nenhum atendimento marcado. <a href="/agendamentos" class="link">Agendar agora</a></p>
+  <% } else { %>
+    <ul class="lista-proximos">
+      <% proximos.forEach(function (p) { %>
+        <li>
+          <span class="quando"><%= formatarData(p.data_agendamento) %> <b><%= formatarHora(p.horario) %></b></span>
+          <span><strong><%= p.cliente %></strong> · <%= p.servico %></span>
+          <span class="suave">com <%= p.barbeiro %></span>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</section>
+
+<%- include('partials/rodape') %>

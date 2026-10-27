@@ -1,0 +1,88 @@
+<%- include('partials/topo', { titulo: 'Clientes' }) %>
+
+<div class="pagina-titulo">
+  <h1>Clientes</h1>
+  <p class="suave">CPF e telefone ficam criptografados no banco (LGPD). Na lista o CPF aparece mascarado.</p>
+</div>
+
+<div class="grade">
+  <!-- FORMULÁRIO -->
+  <section class="cartao">
+    <h2><%= form.id_cliente ? 'Editar cliente' : 'Novo cliente' %></h2>
+    <form action="/clientes<%= form.id_cliente ? '/' + form.id_cliente : '' %>" method="POST" class="formulario">
+      <label>Nome *
+        <input type="text" name="nome" value="<%= form.nome || '' %>" maxlength="100" required>
+      </label>
+      <div class="linha">
+        <label>CPF *
+          <input type="text" name="cpf" value="<%= form.cpf || '' %>" placeholder="000.000.000-00"
+                 maxlength="14" inputmode="numeric" required>
+        </label>
+        <label>Telefone *
+          <input type="tel" name="telefone" value="<%= form.telefone || '' %>" placeholder="(48) 99999-9999"
+                 maxlength="15" required>
+        </label>
+      </div>
+      <label>E-mail
+        <input type="email" name="email" value="<%= form.email || '' %>" maxlength="100">
+      </label>
+      <label>Data de nascimento
+        <input type="date" name="data_nascimento" value="<%= form.data_nascimento || '' %>">
+      </label>
+      <div class="acoes-form">
+        <button type="submit" class="botao botao-primario"><%= form.id_cliente ? 'Salvar alterações' : 'Cadastrar' %></button>
+        <% if (form.id_cliente) { %><a href="/clientes" class="botao botao-contorno">Cancelar</a><% } %>
+      </div>
+    </form>
+  </section>
+
+  <!-- BUSCA + LISTAGEM -->
+  <section class="cartao">
+    <form action="/clientes" method="GET" class="busca" role="search">
+      <input type="search" name="busca" value="<%= busca %>" placeholder="Buscar por nome, e-mail, CPF ou telefone"
+             aria-label="Termo de busca">
+      <button type="submit" class="botao botao-primario">Buscar</button>
+      <% if (busca) { %><a href="/clientes" class="botao botao-contorno">Limpar</a><% } %>
+    </form>
+
+    <p class="contagem">
+      <% if (busca) { %>
+        <%= clientes.length %> resultado(s) para "<strong><%= busca %></strong>"
+      <% } else { %>
+        <%= clientes.length %> cliente(s) cadastrado(s)
+      <% } %>
+    </p>
+
+    <% if (clientes.length === 0) { %>
+      <p class="vazio">Nenhum cliente encontrado.</p>
+    <% } else { %>
+      <div class="tabela-rolagem">
+        <table>
+          <thead>
+            <tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>E-mail</th><th>Nascimento</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% clientes.forEach(function (c) { %>
+              <tr>
+                <td><strong><%= c.nome %></strong></td>
+                <td class="mono"><%= mascararCpf(c.cpf) %></td>
+                <td class="nowrap"><%= c.telefone %></td>
+                <td><%= c.email || '—' %></td>
+                <td><%= formatarData(c.data_nascimento) || '—' %></td>
+                <td class="acoes">
+                  <a href="/clientes/<%= c.id_cliente %>/editar" class="botao botao-pequeno">Editar</a>
+                  <form action="/clientes/<%= c.id_cliente %>/excluir" method="POST"
+                        onsubmit="return confirm('Excluir este cliente?')">
+                    <button type="submit" class="botao botao-pequeno botao-perigo">Excluir</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+</div>
+
+<%- include('partials/rodape') %>

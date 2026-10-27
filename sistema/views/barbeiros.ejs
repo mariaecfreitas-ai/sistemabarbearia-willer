@@ -1,0 +1,74 @@
+<%- include('partials/topo', { titulo: 'Barbeiros' }) %>
+
+<div class="pagina-titulo">
+  <h1>Barbeiros</h1>
+  <p class="suave">Cadastre a equipe. Cada serviço precisa de um barbeiro responsável — <a href="/servicos" class="link">ir para Serviços</a>.</p>
+</div>
+
+<div class="grade">
+  <section class="cartao">
+    <h2><%= form.id_barbeiro ? 'Editar barbeiro' : 'Novo barbeiro' %></h2>
+    <form action="/barbeiros<%= form.id_barbeiro ? '/' + form.id_barbeiro : '' %>" method="POST" class="formulario">
+      <label>Nome *
+        <input type="text" name="nome" value="<%= form.nome || '' %>" maxlength="100" required>
+      </label>
+      <div class="linha">
+        <label>CPF *
+          <input type="text" name="cpf" value="<%= form.cpf || '' %>" placeholder="000.000.000-00"
+                 maxlength="14" inputmode="numeric" required>
+        </label>
+        <label>Telefone *
+          <input type="tel" name="telefone" value="<%= form.telefone || '' %>" placeholder="(48) 99999-9999"
+                 maxlength="15" required>
+        </label>
+      </div>
+      <label>Especialidade
+        <input type="text" name="especialidade" value="<%= form.especialidade || '' %>" maxlength="100"
+               placeholder="Ex.: Degradê, barba, coloração">
+      </label>
+      <label class="checagem">
+        <input type="checkbox" name="ativo" <%= form.ativo ? 'checked' : '' %>> Barbeiro ativo (pode receber novos serviços)
+      </label>
+      <div class="acoes-form">
+        <button type="submit" class="botao botao-primario"><%= form.id_barbeiro ? 'Salvar alterações' : 'Cadastrar' %></button>
+        <% if (form.id_barbeiro) { %><a href="/barbeiros" class="botao botao-contorno">Cancelar</a><% } %>
+      </div>
+    </form>
+  </section>
+
+  <section class="cartao">
+    <p class="contagem"><%= barbeiros.length %> barbeiro(s) cadastrado(s)</p>
+    <% if (barbeiros.length === 0) { %>
+      <p class="vazio">Nenhum barbeiro cadastrado.</p>
+    <% } else { %>
+      <div class="tabela-rolagem">
+        <table>
+          <thead>
+            <tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>Especialidade</th><th>Serviços</th><th>Situação</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% barbeiros.forEach(function (b) { %>
+              <tr>
+                <td><strong><%= b.nome %></strong></td>
+                <td class="mono"><%= mascararCpf(b.cpf) %></td>
+                <td class="nowrap"><%= b.telefone %></td>
+                <td><%= b.especialidade || '—' %></td>
+                <td><%= b.qtd_servicos %></td>
+                <td><span class="selo <%= b.ativo ? 'selo-ok' : 'selo-off' %>"><%= b.ativo ? 'Ativo' : 'Inativo' %></span></td>
+                <td class="acoes">
+                  <a href="/barbeiros/<%= b.id_barbeiro %>/editar" class="botao botao-pequeno">Editar</a>
+                  <form action="/barbeiros/<%= b.id_barbeiro %>/excluir" method="POST"
+                        onsubmit="return confirm('Excluir este barbeiro?')">
+                    <button type="submit" class="botao botao-pequeno botao-perigo">Excluir</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+</div>
+
+<%- include('partials/rodape') %>

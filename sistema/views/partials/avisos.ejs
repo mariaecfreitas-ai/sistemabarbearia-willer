@@ -1,0 +1,9 @@
+<% if (typeof mensagem !== 'undefined' && mensagem) { %>
+  <div class="aviso aviso-<%= mensagem.tipo %>" role="alert"><%= mensagem.texto %></div>
+<% } %>
+<% if (typeof erros !== 'undefined' && erros.length) { %>
+  <div class="aviso aviso-erro" role="alert">
+    <strong>Corrija os campos abaixo:</strong>
+    <ul><% erros.forEach(function (e) { %><li><%= e %></li><% }) %></ul>
+  </div>
+<% } %>

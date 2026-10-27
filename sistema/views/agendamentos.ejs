@@ -1,0 +1,135 @@
+<%- include('partials/topo', { titulo: 'Agendamentos' }) %>
+
+<div class="pagina-titulo">
+  <h1>Agendamentos</h1>
+  <p class="suave">Atendimentos ordenados por dia e horário. O sistema bloqueia choque de horário do mesmo barbeiro.</p>
+</div>
+
+<section class="cartao">
+  <h2><%= form.id_agendamento ? 'Editar agendamento' : 'Novo agendamento' %></h2>
+  <% if (clientes.length === 0 || servicos.length === 0) { %>
+    <div class="aviso aviso-erro">
+      Para agendar é preciso ter ao menos um <a href="/clientes" class="link">cliente</a>
+      e um <a href="/servicos" class="link">serviço</a> cadastrados.
+    </div>
+  <% } %>
+  <form action="/agendamentos<%= form.id_agendamento ? '/' + form.id_agendamento : '' %>" method="POST"
+        class="formulario formulario-agenda">
+    <label>Cliente *
+      <select name="id_cliente" required>
+        <option value="">Selecione…</option>
+        <% clientes.forEach(function (c) { %>
+          <option value="<%= c.id_cliente %>" <%= String(form.id_cliente) === String(c.id_cliente) ? 'selected' : '' %>><%= c.nome %></option>
+        <% }) %>
+      </select>
+    </label>
+    <label>Serviço e barbeiro *
+      <select name="id_servico" required>
+        <option value="">Selecione…</option>
+        <% servicos.filter(function (s) { return s.ativo || String(form.id_servico) === String(s.id_servico); }).forEach(function (s) { %>
+          <option value="<%= s.id_servico %>" <%= String(form.id_servico) === String(s.id_servico) ? 'selected' : '' %>>
+            <%= s.nome %> — <%= s.barbeiro %> (<%= formatarMoeda(s.preco) %> · <%= s.duracao_min %> min)
+          </option>
+        <% }) %>
+      </select>
+    </label>
+    <label>Data *
+      <input type="date" name="data_agendamento" value="<%= form.data_agendamento || '' %>" required>
+    </label>
+    <label>Horário *
+      <input type="time" name="horario" value="<%= form.horario || '' %>" step="900" required>
+    </label>
+    <label>Status
+      <select name="status">
+        <% STATUS.forEach(function (st) { %>
+          <option <%= (form.status || 'Agendado') === st ? 'selected' : '' %>><%= st %></option>
+        <% }) %>
+      </select>
+    </label>
+    <label class="largura-total">Observação
+      <input type="text" name="observacao" value="<%= form.observacao || '' %>" maxlength="255">
+    </label>
+    <div class="acoes-form largura-total">
+      <button type="submit" class="botao botao-primario"><%= form.id_agendamento ? 'Salvar alterações' : 'Agendar' %></button>
+      <% if (form.id_agendamento) { %><a href="/agendamentos" class="botao botao-contorno">Cancelar</a><% } %>
+    </div>
+  </form>
+</section>
+
+<section class="cartao">
+  <div class="cartao-cabecalho">
+    <h2>Agenda</h2>
+    <form action="/agendamentos" method="GET" class="filtros">
+      <label>Dia <input type="date" name="data" value="<%= filtro.data %>"></label>
+      <label>Status
+        <select name="status">
+          <option value="">Todos</option>
+          <% STATUS.forEach(function (st) { %><option <%= filtro.status === st ? 'selected' : '' %>><%= st %></option><% }) %>
+        </select>
+      </label>
+      <button type="submit" class="botao botao-primario">Filtrar</button>
+      <% if (filtro.data || filtro.status) { %><a href="/agendamentos" class="botao botao-contorno">Limpar</a><% } %>
+    </form>
+  </div>
+
+  <p class="contagem"><%= agendamentos.length %> agendamento(s)</p>
+
+  <% if (agendamentos.length === 0) { %>
+    <p class="vazio">Nenhum agendamento encontrado.</p>
+  <% } else { %>
+    <div class="tabela-rolagem">
+      <table class="tabela-agenda">
+        <thead>
+          <tr><th>Horário</th><th>Cliente</th><th>Serviço</th><th>Barbeiro</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% let diaAnterior = null; %>
+          <% agendamentos.forEach(function (a) { %>
+            <% if (a.data_agendamento !== diaAnterior) { diaAnterior = a.data_agendamento; %>
+              <tr class="linha-dia"><td colspan="6">📅 <%= formatarData(a.data_agendamento) %></td></tr>
+            <% } %>
+            <tr class="<%= a.status === 'Cancelado' ? 'cancelado' : '' %>">
+              <td class="hora"><b><%= formatarHora(a.horario) %></b><small>até <%= formatarHora(a.horario_fim) %></small></td>
+              <td>
+                <strong><%= a.cliente_nome %></strong>
+                <small>CPF <span class="mono"><%= mascararCpf(a.cliente_cpf) %></span></small>
+                <small><%= a.cliente_telefone %><%= a.cliente_email ? ' · ' + a.cliente_email : '' %></small>
+              </td>
+              <td>
+                <strong><%= a.servico_nome %></strong>
+                <small><%= formatarMoeda(a.preco) %> · <%= a.duracao_min %> min</small>
+                <% if (a.observacao) { %><small class="obs">“<%= a.observacao %>”</small><% } %>
+              </td>
+              <td>
+                <strong><%= a.barbeiro_nome %></strong>
+                <small><%= a.barbeiro_especialidade || '' %></small>
+                <small><%= a.barbeiro_telefone %></small>
+              </td>
+              <td><span class="selo selo-<%= a.status === 'Agendado' ? 'agendado' : (a.status === 'Concluído' ? 'ok' : 'off') %>"><%= a.status %></span></td>
+              <td class="acoes">
+                <% if (a.status === 'Agendado') { %>
+                  <form action="/agendamentos/<%= a.id_agendamento %>/status" method="POST">
+                    <input type="hidden" name="status" value="Concluído">
+                    <button type="submit" class="botao botao-pequeno">Concluir</button>
+                  </form>
+                  <form action="/agendamentos/<%= a.id_agendamento %>/status" method="POST"
+                        onsubmit="return confirm('Cancelar este agendamento?')">
+                    <input type="hidden" name="status" value="Cancelado">
+                    <button type="submit" class="botao botao-pequeno">Cancelar</button>
+                  </form>
+                <% } %>
+                <a href="/agendamentos/<%= a.id_agendamento %>/editar" class="botao botao-pequeno">Editar</a>
+                <form action="/agendamentos/<%= a.id_agendamento %>/excluir" method="POST"
+                      onsubmit="return confirm('Excluir este agendamento?')">
+                  <button type="submit" class="botao botao-pequeno botao-perigo">Excluir</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>
+
+<%- include('partials/rodape') %>

@@ -1,0 +1,80 @@
+<%- include('partials/topo', { titulo: 'Serviços' }) %>
+
+<div class="pagina-titulo">
+  <h1>Serviços e cortes</h1>
+  <p class="suave">Todo serviço precisa estar vinculado a um barbeiro responsável já cadastrado.</p>
+</div>
+
+<div class="grade">
+  <section class="cartao">
+    <h2><%= form.id_servico ? 'Editar serviço' : 'Novo serviço' %></h2>
+    <% const ativos = barbeiros.filter(function (b) { return b.ativo || String(b.id_barbeiro) === String(form.id_barbeiro); }); %>
+    <% if (ativos.length === 0) { %>
+      <div class="aviso aviso-erro">Cadastre um barbeiro antes de criar serviços. <a href="/barbeiros" class="link">Cadastrar barbeiro</a></div>
+    <% } %>
+    <form action="/servicos<%= form.id_servico ? '/' + form.id_servico : '' %>" method="POST" class="formulario">
+      <label>Nome do serviço *
+        <input type="text" name="nome" value="<%= form.nome || '' %>" maxlength="100" placeholder="Ex.: Corte degradê" required>
+      </label>
+      <label>Descrição
+        <input type="text" name="descricao" value="<%= form.descricao || '' %>" maxlength="255">
+      </label>
+      <div class="linha">
+        <label>Preço (R$) *
+          <input type="number" name="preco" value="<%= form.preco || '' %>" min="0" step="0.01" required>
+        </label>
+        <label>Duração (min) *
+          <input type="number" name="duracao_min" value="<%= form.duracao_min || '' %>" min="5" step="5" required>
+        </label>
+      </div>
+      <label>Barbeiro responsável *
+        <select name="id_barbeiro" required>
+          <option value="">Selecione o barbeiro…</option>
+          <% ativos.forEach(function (b) { %>
+            <option value="<%= b.id_barbeiro %>" <%= String(form.id_barbeiro) === String(b.id_barbeiro) ? 'selected' : '' %>>
+              <%= b.nome %><%= b.especialidade ? ' — ' + b.especialidade : '' %><%= b.ativo ? '' : ' (inativo)' %>
+            </option>
+          <% }) %>
+        </select>
+      </label>
+      <div class="acoes-form">
+        <button type="submit" class="botao botao-primario"><%= form.id_servico ? 'Salvar alterações' : 'Cadastrar' %></button>
+        <% if (form.id_servico) { %><a href="/servicos" class="botao botao-contorno">Cancelar</a><% } %>
+      </div>
+    </form>
+  </section>
+
+  <section class="cartao">
+    <p class="contagem"><%= servicos.length %> serviço(s) cadastrado(s)</p>
+    <% if (servicos.length === 0) { %>
+      <p class="vazio">Nenhum serviço cadastrado.</p>
+    <% } else { %>
+      <div class="tabela-rolagem">
+        <table>
+          <thead>
+            <tr><th>Serviço</th><th>Preço</th><th>Duração</th><th>Barbeiro responsável</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% servicos.forEach(function (s) { %>
+              <tr>
+                <td><strong><%= s.nome %></strong><% if (s.descricao) { %><br><small class="suave"><%= s.descricao %></small><% } %></td>
+                <td><%= formatarMoeda(s.preco) %></td>
+                <td><%= s.duracao_min %> min</td>
+                <td><%= s.barbeiro %><% if (!s.barbeiro_ativo) { %> <span class="selo selo-off">Inativo</span><% } %></td>
+                <td class="acoes">
+                  <a href="/servicos/<%= s.id_servico %>/editar" class="botao botao-pequeno">Editar</a>
+                  <form action="/servicos/<%= s.id_servico %>/excluir" method="POST"
+                        onsubmit="return confirm('Excluir este serviço?')">
+                    <button type="submit" class="botao botao-pequeno botao-perigo">Excluir</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+</div>
+
+<%- include('partials/rodape') %>

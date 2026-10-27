@@ -1,0 +1,76 @@
+// Diagrama Entidade-Relacionamento - Sistema Barbearia (gerado com Graphviz)
+digraph DER {
+  graph [rankdir=LR, splines=spline, nodesep=0.6, ranksep=1.6, pad=0.4, bgcolor="white",
+         fontname="Helvetica", label=<<B>Sistema Barbearia — Diagrama Entidade-Relacionamento (PostgreSQL)</B><BR/><FONT POINT-SIZE="10">PK = chave primária · FK = chave estrangeira ·  <FONT COLOR="#a23b2a"><B>[C]</B></FONT>= dado criptografado (pgcrypto)</FONT>>,
+         labelloc=t, fontsize=16];
+  node  [shape=plaintext, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10, color="#555555", penwidth=1.4];
+
+  usuarios [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8e6520">
+      <TR><TD BGCOLOR="#1d1b18" COLSPAN="2"><FONT COLOR="white"><B>usuarios</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B> id_usuario</TD><TD ALIGN="LEFT">SERIAL</TD></TR>
+      <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">email <I>(UNIQUE)</I></TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">senha <FONT COLOR="#a23b2a"><B>[C]</B></FONT> <I>(bcrypt)</I></TD><TD ALIGN="LEFT">TEXT</TD></TR>
+      <TR><TD ALIGN="LEFT">criado_em</TD><TD ALIGN="LEFT">TIMESTAMP</TD></TR>
+    </TABLE>>];
+
+  clientes [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8e6520">
+      <TR><TD BGCOLOR="#1d1b18" COLSPAN="2"><FONT COLOR="white"><B>clientes</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B> id_cliente</TD><TD ALIGN="LEFT" PORT="pk">SERIAL</TD></TR>
+      <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">cpf <FONT COLOR="#a23b2a"><B>[C]</B></FONT></TD><TD ALIGN="LEFT">BYTEA</TD></TR>
+      <TR><TD ALIGN="LEFT">cpf_hash <I>(UNIQUE)</I></TD><TD ALIGN="LEFT">CHAR(64)</TD></TR>
+      <TR><TD ALIGN="LEFT">telefone <FONT COLOR="#a23b2a"><B>[C]</B></FONT></TD><TD ALIGN="LEFT">BYTEA</TD></TR>
+      <TR><TD ALIGN="LEFT">email</TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">data_nascimento</TD><TD ALIGN="LEFT">DATE</TD></TR>
+      <TR><TD ALIGN="LEFT">criado_em</TD><TD ALIGN="LEFT">TIMESTAMP</TD></TR>
+    </TABLE>>];
+
+  barbeiros [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8e6520">
+      <TR><TD BGCOLOR="#1d1b18" COLSPAN="2"><FONT COLOR="white"><B>barbeiros</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B> id_barbeiro</TD><TD ALIGN="LEFT" PORT="pk">SERIAL</TD></TR>
+      <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">cpf <FONT COLOR="#a23b2a"><B>[C]</B></FONT></TD><TD ALIGN="LEFT">BYTEA</TD></TR>
+      <TR><TD ALIGN="LEFT">cpf_hash <I>(UNIQUE)</I></TD><TD ALIGN="LEFT">CHAR(64)</TD></TR>
+      <TR><TD ALIGN="LEFT">telefone <FONT COLOR="#a23b2a"><B>[C]</B></FONT></TD><TD ALIGN="LEFT">BYTEA</TD></TR>
+      <TR><TD ALIGN="LEFT">especialidade</TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">ativo</TD><TD ALIGN="LEFT">BOOLEAN</TD></TR>
+      <TR><TD ALIGN="LEFT">criado_em</TD><TD ALIGN="LEFT">TIMESTAMP</TD></TR>
+    </TABLE>>];
+
+  servicos [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8e6520">
+      <TR><TD BGCOLOR="#1d1b18" COLSPAN="2"><FONT COLOR="white"><B>servicos</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B> id_servico</TD><TD ALIGN="LEFT" PORT="pk">SERIAL</TD></TR>
+      <TR><TD ALIGN="LEFT">nome</TD><TD ALIGN="LEFT">VARCHAR(100)</TD></TR>
+      <TR><TD ALIGN="LEFT">descricao</TD><TD ALIGN="LEFT">VARCHAR(255)</TD></TR>
+      <TR><TD ALIGN="LEFT">preco</TD><TD ALIGN="LEFT">NUMERIC(10,2)</TD></TR>
+      <TR><TD ALIGN="LEFT">duracao_min</TD><TD ALIGN="LEFT">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="fk" BGCOLOR="#f3e6cc"><B>FK</B> id_barbeiro</TD><TD ALIGN="LEFT" BGCOLOR="#f3e6cc">INTEGER</TD></TR>
+    </TABLE>>];
+
+  agendamentos [label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="5" COLOR="#8e6520">
+      <TR><TD BGCOLOR="#1d1b18" COLSPAN="2"><FONT COLOR="white"><B>agendamentos</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B> id_agendamento</TD><TD ALIGN="LEFT">SERIAL</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="fkc" BGCOLOR="#f3e6cc"><B>FK</B> id_cliente</TD><TD ALIGN="LEFT" BGCOLOR="#f3e6cc">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="fks" BGCOLOR="#f3e6cc"><B>FK</B> id_servico</TD><TD ALIGN="LEFT" BGCOLOR="#f3e6cc">INTEGER</TD></TR>
+      <TR><TD ALIGN="LEFT">data_agendamento</TD><TD ALIGN="LEFT">DATE</TD></TR>
+      <TR><TD ALIGN="LEFT">horario</TD><TD ALIGN="LEFT">TIME</TD></TR>
+      <TR><TD ALIGN="LEFT">status</TD><TD ALIGN="LEFT">VARCHAR(20)</TD></TR>
+      <TR><TD ALIGN="LEFT">observacao</TD><TD ALIGN="LEFT">VARCHAR(255)</TD></TR>
+      <TR><TD ALIGN="LEFT">criado_em</TD><TD ALIGN="LEFT">TIMESTAMP</TD></TR>
+    </TABLE>>];
+
+  // Relacionamentos (1 : N)
+  barbeiros:pk:e -> servicos:fk:w     [dir=both, arrowtail=teetee, arrowhead=crowodot, label="  1 : N  é responsável por  "];
+  servicos:pk:e -> agendamentos:fks:w [dir=both, arrowtail=teetee, arrowhead=crowodot, label="  1 : N  é contratado em  "];
+  clientes:pk:e -> agendamentos:fkc:w [dir=both, arrowtail=teetee, arrowhead=crowodot, label="  1 : N  realiza  "];
+
+  { rank=same; barbeiros; clientes; usuarios; }
+  barbeiros -> clientes -> usuarios [style=invis];
+}
